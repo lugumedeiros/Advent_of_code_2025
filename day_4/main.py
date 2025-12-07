@@ -28,12 +28,13 @@ def get_neighboor_matrix(matrix:list[list]):
         sum_matrix.append(sum_row)
     return sum_matrix
 
-def get_masked_matrix(matrix, mask_matrix):
+def get_masked_matrix(matrix, mask_matrix, invert=False):
     new_matrix = list()
+    test = 0 if invert else 1
     for x in range(len(matrix)):
         new_row = list()
         for y in range(len(matrix[0])):
-            if mask_matrix[x][y] == 1:
+            if mask_matrix[x][y] == test:
                 new_row.append(matrix[x][y])
             else:
                 new_row.append(0)
@@ -52,7 +53,8 @@ def get_less_than_4_matrix(matrix):
 
 
 if __name__ == "__main__":
-    
+
+    PART_ONE = False
     file_name = r"day_4/codes.txt"
     codes = ""
     with open(file_name, "r") as file:
@@ -67,36 +69,57 @@ if __name__ == "__main__":
             row.append(value)
         paper_matrix.append(row)
     
+    if PART_ONE:
+        print("=========== Matrix ===========")
+        for i in paper_matrix:
+            print(i)
+        print("\n")
 
-    print("=========== Matrix ===========")
-    for i in paper_matrix:
-        print(i)
-    print("\n")
+        neighboor_matrix = get_neighboor_matrix(paper_matrix)
+        print("======= NeighboorMatrix =======")
+        for i in neighboor_matrix:
+            print(i)
+        print("\n")
 
-    neighboor_matrix = get_neighboor_matrix(paper_matrix)
-    print("========== SUMatrix ==========")
-    for i in neighboor_matrix:
-        print(i)
-    print("\n")
+        less_than_4_sum_matrix = get_less_than_4_matrix(neighboor_matrix)
+        print("======== Less4_Matrix ========")
+        for row in less_than_4_sum_matrix:
+            print(row)
+        print("\n")
 
-    less_than_4_sum_matrix = get_less_than_4_matrix(neighboor_matrix)
-    print("======== Less4_Matrix ========")
-    for row in less_than_4_sum_matrix:
-        print(row)
-    print("\n")
+        masked_matrix = get_masked_matrix(less_than_4_sum_matrix, paper_matrix)
+        print("======== Masked_Matrix ========")
+        for i in masked_matrix:
+            print(i)
+        print("\n")
 
-    masked_matrix = get_masked_matrix(less_than_4_sum_matrix, paper_matrix)
-    print("======== Masked_Matrix ========")
-    for i in masked_matrix:
-        print(i)
-    print("\n")
-
-    valid_positions = 0
-    for row in masked_matrix:
-        for pos in row:
-            if pos == 1:
-                valid_positions += 1
+        valid_positions = 0
+        for row in masked_matrix:
+            for pos in row:
+                if pos == 1:
+                    valid_positions += 1
+        
+        print(f"Valid SUM: {valid_positions}")
     
-    print(f"Valid SUM: {valid_positions}")
+    else:
+        removed_rolls = 0
+        while True:
+            neighboor_matrix = get_neighboor_matrix(paper_matrix)        
+            less_than_4_sum_matrix = get_less_than_4_matrix(neighboor_matrix)
+            masked_matrix = get_masked_matrix(less_than_4_sum_matrix, paper_matrix)
+            
+            valid_positions = 0
+            for row in masked_matrix:
+                for pos in row:
+                    if pos == 1:
+                        valid_positions += 1
+            
+            if valid_positions == 0:
+                break
+            else:
+                removed_rolls += valid_positions
+            paper_matrix = get_masked_matrix(paper_matrix, masked_matrix, invert=True)
+        print("Removed rolls:", removed_rolls)
+
 
 
