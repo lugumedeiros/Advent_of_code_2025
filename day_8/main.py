@@ -45,6 +45,15 @@ def get_max_values(list_values:list, values=3) -> list:
         list_values.pop(idx)
     return max_values
 
+def check_map_is_finished(net_map:dict):
+    first = None
+    for item in net_map.values():
+        if first is None:
+            first = item
+        elif first != item:
+            return False
+    return True
+
 
 if __name__ == "__main__":
     
@@ -81,8 +90,10 @@ if __name__ == "__main__":
     for x in range(len(position_list)):
         net_map[x] = x
 
-    max_count = 1000
+    max_count = len(position_list)
     current_count = 1
+    last_a_node = None
+    last_b_node = None
     for distance, node_a, node_b in sorted_distance_list:
         id_a = node_a.id
         id_b = node_b.id
@@ -98,15 +109,18 @@ if __name__ == "__main__":
             net_map[id_a] = net_b
         
         if net_b != net_a:
+            last_a_node = node_a
+            last_b_node = node_b
             for id, net in net_map.items():
                 if net == net_b:
                     net_map[id] = net_a
         if DEBUG:
             print(net_map, "\n")
-        if current_count < max_count:
-            current_count += 1
-        else:
-            break
+        
+        current_count += 1
+        if current_count % 1000 == 0:
+            if check_map_is_finished(net_map):
+                break
     
     ##########################################################
 
@@ -119,4 +133,6 @@ if __name__ == "__main__":
         net_id_count_list.append(count)
     
     print(get_max_values(net_id_count_list))
+    print(last_a_node.get_name())
+    print(last_b_node.get_name())
 
